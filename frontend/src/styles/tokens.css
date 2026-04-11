@@ -1,0 +1,52 @@
+:root {
+  --bg-primary:   #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-surface:   #0f3460;
+  --text-primary: #e0e0e0;
+  --text-muted:   #888;
+  --accent:       #e94560;
+  --font-sans:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+  --radius:       6px;
+  --shadow:       0 2px 8px rgba(0, 0, 0, 0.4);
+  --border:       #2a2a4a;
+  --surface-hover: #2a2a5a;
+  --purple:       #a78bfa;
+  --purple-dark:  #4c1d95;
+  --green:        #69db7c;
+  --red:          #ff6b6b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes indeterminate {
+  0%   { left: -40%; width: 40%; }
+  60%  { left: 100%; width: 100%; }
+  100% { left: 100%; width: 100%; }
+}
+
+@keyframes selection-pulse {
+  0%, 100% { opacity: 0.25; }
+  50%       { opacity: 0.7; }
+}
+
+/* No will-change hint — browsers auto-promote opacity animations.
+   Any will-change (on pane or path) can create compositor boundaries
+   that cause 1 px seams between basemap tiles. */
+.leaflet-glow-path {
+  animation: selection-pulse 1.4s ease-in-out infinite;
+}
+
+/* Transit-map line style: rounded caps/joins applied to both casing and color layers */
+.route-line {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

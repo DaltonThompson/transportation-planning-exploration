@@ -1,0 +1,52 @@
+# Environment variables — never commit real credentials
+.env
+.env.local
+.env.*.local
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+
+# Backend runtime cache (GTFS JSON blobs, OSM pickles)
+backend/cache/
+backend/data/
+
+# Local planning / AI-authored notes (kept locally, not published)
+notes/
+
+# Frontend dependencies and build output
+node_modules/
+dist/
+build/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Claude local settings
+**/settings.local.json
+**/.claude/
