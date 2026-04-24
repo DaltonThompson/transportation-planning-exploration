@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import osmnx as ox
 
 from config import settings
 
@@ -202,6 +201,8 @@ def load_graph(place: str | list[str] | None = None) -> GraphState:
             return pickle.load(f)
 
     logger.info("Loading OSM graph for %s …", place)
+
+    import osmnx as ox  # lazy: avoided when pickle is used (saves ~80 MB)
 
     G = ox.graph_from_place(place, network_type=settings.OSM_NETWORK_TYPE)
     G = ox.add_edge_speeds(G)       # fills speed_kph from maxspeed + OSRM

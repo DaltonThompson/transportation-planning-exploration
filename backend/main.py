@@ -18,10 +18,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import db.store as _db
 from api.routes import router, load_persisted_scenarios, load_persisted_runs
 from api.state import app_state
-from bike.loader import load_bike_infrastructure
 from config import settings
 from graph.loader import load_graph
-from gtfs.loader import load_gtfs_stops
+
+# bike.loader and gtfs.loader are imported lazily inside the startup handlers
+# so osmnx isn't loaded at all when DISABLE_GTFS_SYNC/DISABLE_BIKE_INFRA are set.
 
 _scheduler = AsyncIOScheduler()
 
@@ -130,6 +131,7 @@ async def startup() -> None:
     # Pre-bake bike infrastructure so /api/bike-infra is ready without
     # browsers hitting Overpass themselves.
     async def _load_bike_infra() -> None:
+        from bike.loader import load_bike_infrastructure
         try:
             log.info("Loading bike infrastructure on startup …")
             with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
