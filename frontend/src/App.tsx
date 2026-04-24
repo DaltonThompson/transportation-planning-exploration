@@ -56,7 +56,10 @@ export default function App() {
     queryKey: ["status"],
     queryFn: api.getStatus,
     // Poll every 2s until stops are loaded, then drop to 30s
-    refetchInterval: (query) => (query.state.data?.stops_loaded ? 30_000 : 2_000),
+    refetchInterval: (query) => {
+      const d = query.state.data;
+      return d?.stops_loaded || d?.gtfs_disabled ? 30_000 : 2_000;
+    },
   });
 
   const { data: edgesData } = useQuery({
@@ -156,7 +159,7 @@ export default function App() {
             <span>Loading OSM graph…</span>
           </>
         )}
-        {graphInfo?.loaded && !serverStatus?.stops_loaded && (
+        {graphInfo?.loaded && !serverStatus?.stops_loaded && !serverStatus?.gtfs_disabled && (
           <>
             <span style={{ display: "inline-block", width: 10, height: 10, border: "2px solid #f59e0b", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
             <span style={{ color: "#f59e0b" }}>Syncing GTFS…</span>

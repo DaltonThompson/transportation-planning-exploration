@@ -18,6 +18,7 @@ export interface ServerStatus {
   stop_count: number;
   shape_count: number;
   feeds_synced: string[];
+  gtfs_disabled?: boolean;
 }
 
 export const api = {

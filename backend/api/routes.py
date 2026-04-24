@@ -304,6 +304,7 @@ def get_status() -> dict:
         "stop_count":   len(app_state.stop_records),
         "shape_count":  len(app_state.route_shapes),
         "feeds_synced": list(app_state.feed_slugs),
+        "gtfs_disabled": settings.DISABLE_GTFS_SYNC,
     }
 
 
