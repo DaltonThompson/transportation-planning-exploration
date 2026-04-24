@@ -123,6 +123,25 @@ export function LayerPanel() {
     staleTime: 30_000,
   });
 
+  const { data: serverStatus } = useQuery({
+    queryKey: ["status"],
+    queryFn: api.getStatus,
+    staleTime: 30_000,
+  });
+  const demoMode = !!serverStatus?.gtfs_disabled;
+
+  // Overlays disabled in demo deployment (no data source available).
+  const DEMO_UNSUPPORTED_OVERLAYS: ReadonlySet<keyof OverlayState> = new Set([
+    "bikeInfraOSM",
+    "walkToBusStop",
+    "collisionJunctions",
+    "populationDensity",
+    "zoning",
+    "economicActivity",
+    "jobs",
+    "capitalNYBikeMap",
+  ] as const);
+
   return (
     <div style={{
       position: "absolute",
@@ -190,18 +209,22 @@ export function LayerPanel() {
 
           {/* ── Road segments — checkbox with nested coloring modes ── */}
           <div style={{ marginBottom: 8 }}>
-            <label style={itemStyle}>
+            <label
+              style={{ ...itemStyle, cursor: demoMode ? "not-allowed" : "pointer", opacity: demoMode ? 0.4 : 1 }}
+              title={demoMode ? "Not available in demo" : undefined}
+            >
               <input
                 type="checkbox"
-                checked={roadSegmentsOn}
-                onChange={handleRoadSegmentsToggle}
+                checked={!demoMode && roadSegmentsOn}
+                disabled={demoMode}
+                onChange={() => !demoMode && handleRoadSegmentsToggle()}
                 style={{ accentColor: "var(--purple)", margin: 0, flexShrink: 0 }}
               />
-              <span style={{ color: roadSegmentsOn ? "var(--text-primary)" : "var(--text-muted)" }}>
+              <span style={{ color: roadSegmentsOn && !demoMode ? "var(--text-primary)" : "var(--text-muted)" }}>
                 Road segments
               </span>
             </label>
-            {roadSegmentsOn && (
+            {!demoMode && roadSegmentsOn && (
               <div style={{ paddingLeft: 22, display: "flex", flexDirection: "column", gap: 2, marginTop: 2 }}>
                 {ROAD_COLOR_MODES.map(({ key, label }) => (
                   <label key={key} style={{ ...itemStyle, padding: "1px 0" }}>
@@ -297,8 +320,8 @@ export function LayerPanel() {
                 Rail routes
               </span>
             </label>
-            {/* Dynamic sync buttons for all configured feeds */}
-            {(feeds ?? []).map((feed) => (
+            {/* Dynamic sync buttons for all configured feeds — hidden in demo */}
+            {!demoMode && (feeds ?? []).map((feed) => (
               <div key={feed.slug} style={{ paddingLeft: 20 }}>
                 <FeedSyncButton feed={feed} />
               </div>
@@ -385,19 +408,27 @@ export function LayerPanel() {
 
           {/* ── Remaining overlays — flat, no sub-headings ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {FLAT_OVERLAYS.map(({ key, label }) => (
-              <label key={key} style={itemStyle}>
-                <input
-                  type="checkbox"
-                  checked={overlays[key]}
-                  onChange={() => toggleOverlay(key)}
-                  style={{ accentColor: "var(--purple)", margin: 0, flexShrink: 0 }}
-                />
-                <span style={{ color: overlays[key] ? "var(--text-primary)" : "var(--text-muted)", lineHeight: 1.3 }}>
-                  {label}
-                </span>
-              </label>
-            ))}
+            {FLAT_OVERLAYS.map(({ key, label }) => {
+              const disabled = demoMode && DEMO_UNSUPPORTED_OVERLAYS.has(key);
+              return (
+                <label
+                  key={key}
+                  style={{ ...itemStyle, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.4 : 1 }}
+                  title={disabled ? "Not available in demo" : undefined}
+                >
+                  <input
+                    type="checkbox"
+                    checked={!disabled && overlays[key]}
+                    disabled={disabled}
+                    onChange={() => !disabled && toggleOverlay(key)}
+                    style={{ accentColor: "var(--purple)", margin: 0, flexShrink: 0 }}
+                  />
+                  <span style={{ color: overlays[key] && !disabled ? "var(--text-primary)" : "var(--text-muted)", lineHeight: 1.3 }}>
+                    {label}
+                  </span>
+                </label>
+              );
+            })}
           </div>
 
         </div>

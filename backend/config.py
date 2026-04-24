@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     DISABLE_GTFS_SYNC: bool = False
     DISABLE_BIKE_INFRA: bool = False
 
+    # When DISABLE_GTFS_SYNC=True, load pre-baked GTFS outputs from this pickle
+    # so bus routes / stops display without any runtime GTFS fetch or parse.
+    DEMO_GTFS_PATH: str = ""
+
     # CDTA GTFS feeds (kept for backward-compat; startup sync reads GTFS_FEED_URLS)
     CDTA_STATIC_URL: str = "https://www.cdta.org/schedules/google_transit.zip"
     CDTA_RT_VEHICLES_URL: str = (

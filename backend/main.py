@@ -10,6 +10,7 @@ background tasks so the server is immediately responsive.
 """
 
 import logging
+from pathlib import Path
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
@@ -127,6 +128,23 @@ async def startup() -> None:
         ]))
     else:
         log.info("GTFS sync disabled via DISABLE_GTFS_SYNC")
+        if settings.DEMO_GTFS_PATH and Path(settings.DEMO_GTFS_PATH).exists():
+            import pickle
+            log.info("Loading pre-baked GTFS artifact from %s", settings.DEMO_GTFS_PATH)
+            with open(settings.DEMO_GTFS_PATH, "rb") as f:
+                baked = pickle.load(f)
+            app_state.transit_stops = baked["transit_stops"]
+            app_state.stop_records = baked["stop_records"]
+            app_state.route_shapes = baked["route_shapes"]
+            app_state.route_details = baked["route_details"]
+            app_state.stop_schedules = baked["stop_schedules"]
+            app_state.feed_slugs = baked["feed_slugs"]
+            log.info(
+                "Demo GTFS loaded: %d stops, %d shapes, %d feeds",
+                len(app_state.stop_records),
+                len(app_state.route_shapes),
+                len(app_state.feed_slugs),
+            )
 
     # Pre-bake bike infrastructure so /api/bike-infra is ready without
     # browsers hitting Overpass themselves.

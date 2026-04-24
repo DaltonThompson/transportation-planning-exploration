@@ -18,6 +18,7 @@ __pycache__/
 # Backend runtime cache (GTFS JSON blobs, OSM pickles)
 backend/cache/*
 !backend/cache/graph.pkl
+!backend/cache/gtfs.pkl
 backend/data/
 backend/.gtfs_cache/
 backend/transport.db
