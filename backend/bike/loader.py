@@ -20,8 +20,6 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import osmnx as ox
-
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -160,6 +158,7 @@ def load_bike_infrastructure(
             return cached
 
     logger.info("Fetching bike infrastructure from OSM for %s …", place)
+    import osmnx as ox  # lazy: heavy import only when bike infra is actually fetched
     t0 = time.time()
     gdf = ox.features_from_place(place, tags=_BIKE_TAGS)
     features = _extract_features(gdf)

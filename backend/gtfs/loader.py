@@ -11,6 +11,8 @@ SHA-256 deduplication: if the feed hash matches the last-seen hash,
 loading is skipped (override with force=True).
 """
 
+from __future__ import annotations
+
 import hashlib
 import logging
 import math
@@ -18,9 +20,7 @@ import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import gtfs_kit as gk
 import httpx
-import osmnx as ox
 
 from config import settings
 from graph.loader import GraphState
@@ -626,6 +626,13 @@ def load_gtfs_stops(
     *changed* is False when the feed hash matches the previous fetch.
     """
     logger.info("Fetching GTFS feed '%s' from %s", slug, url)
+
+    # Lazy imports: gtfs_kit pulls pandas + networkx; osmnx pulls geopandas +
+    # shapely + scikit-learn. Keep them out of memory when GTFS is disabled.
+    import gtfs_kit as gk
+    import osmnx as ox
+    globals()["gk"] = gk
+    globals()["ox"] = ox
 
     cache_path = _GTFS_CACHE_DIR / f"{slug}.zip"
 
