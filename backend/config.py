@@ -38,6 +38,11 @@ class Settings(BaseSettings):
     ]
     OSM_NETWORK_TYPE: str = "drive"
 
+    # Skip GTFS + bike-infra startup fetches. Used for memory-constrained demo
+    # deployments (e.g. Render free tier, 512 MB cap).
+    DISABLE_GTFS_SYNC: bool = False
+    DISABLE_BIKE_INFRA: bool = False
+
     # CDTA GTFS feeds (kept for backward-compat; startup sync reads GTFS_FEED_URLS)
     CDTA_STATIC_URL: str = "https://www.cdta.org/schedules/google_transit.zip"
     CDTA_RT_VEHICLES_URL: str = (

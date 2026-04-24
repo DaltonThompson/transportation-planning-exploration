@@ -120,9 +120,12 @@ async def startup() -> None:
 
     # Sync all configured feeds in parallel so a slow feed (e.g. Amtrak) doesn't
     # delay a fast one (e.g. CDTA).
-    asyncio.ensure_future(asyncio.gather(*[
-        _auto_sync_feed(slug) for slug in settings.GTFS_FEED_URLS
-    ]))
+    if not settings.DISABLE_GTFS_SYNC:
+        asyncio.ensure_future(asyncio.gather(*[
+            _auto_sync_feed(slug) for slug in settings.GTFS_FEED_URLS
+        ]))
+    else:
+        log.info("GTFS sync disabled via DISABLE_GTFS_SYNC")
 
     # Pre-bake bike infrastructure so /api/bike-infra is ready without
     # browsers hitting Overpass themselves.
@@ -141,7 +144,10 @@ async def startup() -> None:
         except Exception as exc:
             log.warning("Bike infrastructure load failed (non-fatal): %s", exc)
 
-    asyncio.ensure_future(_load_bike_infra())
+    if not settings.DISABLE_BIKE_INFRA:
+        asyncio.ensure_future(_load_bike_infra())
+    else:
+        log.info("Bike infra load disabled via DISABLE_BIKE_INFRA")
 
     # Schedule GTFS syncs: daily at 03:00 for CDTA, weekly on Sunday 03:30 for others
     async def _scheduled_sync(slug: str) -> None:
@@ -149,10 +155,11 @@ async def startup() -> None:
             return
         await _auto_sync_feed(slug)
 
-    for _slug in settings.GTFS_FEED_URLS:
-        if _slug == "cdta":
-            _scheduler.add_job(_scheduled_sync, "cron", hour=3, minute=0, args=[_slug], id=f"gtfs_{_slug}_daily")
-        else:
-            _scheduler.add_job(_scheduled_sync, "cron", day_of_week="sun", hour=3, minute=30, args=[_slug], id=f"gtfs_{_slug}_weekly")
-    _scheduler.start()
-    log.info("Scheduled GTFS sync jobs started")
+    if not settings.DISABLE_GTFS_SYNC:
+        for _slug in settings.GTFS_FEED_URLS:
+            if _slug == "cdta":
+                _scheduler.add_job(_scheduled_sync, "cron", hour=3, minute=0, args=[_slug], id=f"gtfs_{_slug}_daily")
+            else:
+                _scheduler.add_job(_scheduled_sync, "cron", day_of_week="sun", hour=3, minute=30, args=[_slug], id=f"gtfs_{_slug}_weekly")
+        _scheduler.start()
+        log.info("Scheduled GTFS sync jobs started")
