@@ -27,6 +27,11 @@ def main() -> None:
 
     state = load_graph()
 
+    # Drop coords_latlon (frontend renders straight u→v lines; see known issue #1).
+    # Saves ~60 MB of Python float lists on a county-sized graph.
+    for edge in state.edges:
+        edge.coords_latlon = []
+
     with open(out, "wb") as f:
         pickle.dump(state, f, protocol=pickle.HIGHEST_PROTOCOL)
 
