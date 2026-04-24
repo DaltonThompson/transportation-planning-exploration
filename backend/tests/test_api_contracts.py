@@ -21,6 +21,8 @@ from fastapi.testclient import TestClient
 
 from api.routes import router
 from api.state import app_state
+from config import settings
+from db import store as _db
 from simulation.runner import MetricDeltas, RunResult
 from simulation.engine import SimulationResult, SimulationFrame
 from tests.fixtures import make_graph
@@ -32,8 +34,10 @@ from scenarios.patcher import Scenario
 # ---------------------------------------------------------------------------
 
 @pytest.fixture(autouse=True)
-def _reset_state():
-    """Reset app_state before and after each test."""
+def _reset_state(tmp_path, monkeypatch):
+    """Reset app_state and point persistence at a per-test temp SQLite file."""
+    monkeypatch.setattr(settings, "DB_PATH", str(tmp_path / "test.db"))
+    _db.init_db()
     app_state.graph = make_graph()
     app_state.scenarios = {}
     app_state.runs = {}
