@@ -8,7 +8,10 @@ scenario simulations diverge meaningfully from timestep 0.
 
 import logging
 import math
+import os
+import pickle
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -191,6 +194,13 @@ def load_graph(place: str | list[str] | None = None) -> GraphState:
     Returns a GraphState ready to be passed to the simulation engine.
     """
     place = place or settings.OSM_PLACE
+
+    pickle_path = os.environ.get("GRAPH_PICKLE_PATH")
+    if pickle_path and Path(pickle_path).exists():
+        logger.info("Loading GraphState from pickle: %s", pickle_path)
+        with open(pickle_path, "rb") as f:
+            return pickle.load(f)
+
     logger.info("Loading OSM graph for %s …", place)
 
     G = ox.graph_from_place(place, network_type=settings.OSM_NETWORK_TYPE)

@@ -16,7 +16,8 @@ __pycache__/
 .eggs/
 
 # Backend runtime cache (GTFS JSON blobs, OSM pickles)
-backend/cache/
+backend/cache/*
+!backend/cache/graph.pkl
 backend/data/
 backend/.gtfs_cache/
 backend/transport.db
