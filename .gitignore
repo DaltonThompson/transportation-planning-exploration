@@ -18,6 +18,10 @@ __pycache__/
 # Backend runtime cache (GTFS JSON blobs, OSM pickles)
 backend/cache/
 backend/data/
+backend/.gtfs_cache/
+backend/transport.db
+backend/*.db
+backend/*.db-journal
 
 # Local planning / AI-authored notes (kept locally, not published)
 notes/
