@@ -1,6 +1,6 @@
-# Transportation Policy Evaluation Engine
+# Albany Transit & Road Map
 
-A deterministic dual-run traffic simulator for evaluating transit and road policy changes on a live map. Define a scenario patch (change a bus route's headway, reduce a road's capacity, add or remove a stop), run baseline and scenario simulations back-to-back, and compare congestion deltas across the network with timeline playback.
+An interactive map of Albany's transit and road network.
 
 Built around real Albany County, NY data — OpenStreetMap road network, CDTA bus GTFS feeds, Amtrak rail shapes.
 
@@ -9,10 +9,8 @@ Built around real Albany County, NY data — OpenStreetMap road network, CDTA bu
 ## What it does
 
 - Loads the Albany County road graph from OSM (~30–60s cached after first run).
-- Pulls live GTFS feeds for CDTA buses and Amtrak; snaps stops and route shapes to OSM edges.
-- Runs a deterministic flow-propagation simulation with configurable decay, congestion floor, and turn weights.
-- Encodes results as keyframes + diffs (full snapshot at t=0, edges-only deltas every 30s) so the frontend can scrub through a 60-minute simulation smoothly.
-- Lets you author scenario patches (`route_headway`, `stop_headway`, `edge_capacity`, `edge_speed`, `stop_add`, `stop_remove`), runs baseline and scenario in parallel, and renders the delta as a heatmap overlay.
+- Pulls GTFS feeds for CDTA buses and Amtrak; snaps stops and route shapes to OSM edges.
+- Renders the network on an interactive map with CDTA division filtering.
 
 ## Stack
 
@@ -22,12 +20,12 @@ Built around real Albany County, NY data — OpenStreetMap road network, CDTA bu
 
 ## Status
 
-MVP — locally runnable end-to-end. Scenario authoring, dual-run comparison, timeline playback, and CDTA division filtering all work. All 8 backend unit tests pass. Frontend production build is clean.
+MVP — locally runnable end-to-end. All 8 backend unit tests pass. Frontend production build is clean.
 
 Known limitations:
+
 - No persistence — state lives in memory and resets on server restart.
 - Edge geometry renders as straight u→v lines rather than curved OSM road shapes.
-- Background flow seeder over-injects on edges in cycles.
 
 See `BACKLOG.md` for the full post-MVP list.
 
@@ -53,12 +51,12 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open <http://localhost:3000>.
 
 ## Repository layout
 
-```
-├── backend/      FastAPI simulation server
+```text
+├── backend/      FastAPI server
 ├── frontend/     React/TypeScript SPA
 ├── MVP.md        Locked MVP feature list
 └── BACKLOG.md    Post-MVP enhancements

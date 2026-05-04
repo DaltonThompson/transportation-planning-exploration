@@ -731,31 +731,38 @@ function SingleRouteDetail({
           <div>
             <div style={LABEL}>Frequency by time of day</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 5, marginTop: 6 }}>
-              {Object.entries(data.headway_by_period).map(([period, secs]) => (
-                <div key={period} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 90, fontSize: 12, color: "var(--text-muted)", flexShrink: 0 }}>
-                    {period}
-                  </div>
-                  <div style={{
-                    flex: 1, height: 4, borderRadius: 2,
-                    background: "var(--border)", position: "relative", overflow: "hidden",
-                  }}>
+              {Object.entries(data.headway_by_period).map(([period, secs]) => {
+                const bph = secs > 0 ? 3600 / secs : 0;
+                const maxBph = 14;
+                return (
+                  <div key={period} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 90, fontSize: 12, color: "var(--text-muted)", flexShrink: 0 }}>
+                      {period}
+                    </div>
                     <div style={{
-                      position: "absolute", left: 0, top: 0, bottom: 0,
-                      width: `${Math.min(100, (secs / 3600) * 100)}%`,
-                      background: headwayBadgeColor(secs),
-                      borderRadius: 2,
-                    }} />
+                      flex: 1, height: 4, borderRadius: 2,
+                      background: "var(--border)", position: "relative", overflow: "hidden",
+                    }}>
+                      <div style={{
+                        position: "absolute", left: 0, top: 0, bottom: 0,
+                        width: `${Math.min(100, (bph / maxBph) * 100)}%`,
+                        background: headwayBadgeColor(secs),
+                        borderRadius: 2,
+                      }} />
+                    </div>
+                    <div style={{
+                      fontFamily: "var(--font-mono)", fontSize: 12,
+                      minWidth: 72, textAlign: "right",
+                      color: headwayBadgeColor(secs),
+                    }}>
+                      {bph < 1 ? bph.toFixed(1) : Math.round(bph)}/hr{" "}
+                      <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
+                        ({headwayLabel(secs)})
+                      </span>
+                    </div>
                   </div>
-                  <div style={{
-                    fontFamily: "var(--font-mono)", fontSize: 12,
-                    minWidth: 48, textAlign: "right",
-                    color: headwayBadgeColor(secs),
-                  }}>
-                    {headwayLabel(secs)}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </>
